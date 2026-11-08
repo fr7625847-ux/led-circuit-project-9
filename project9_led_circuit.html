@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A beginner-friendly interactive activity about building a battery, resistor, and LED circuit.">
+  <title>Build an LED Circuit | Interactive Learning Activity</title>
+  <style>
+    :root { color-scheme: light; --ink:#182a42; --muted:#52667d; --line:#dbe5ee; --paper:#fff; --soft:#f4f8fb; --blue:#1959a3; --teal:#13745f; --amber:#956116; --red:#a22b35; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:#eff4f8; color:var(--ink); font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    a { color:#15559f; } a:hover { text-decoration-thickness:2px; }
+    button,select { font:inherit; }
+    button:focus-visible,select:focus-visible,a:focus-visible { outline:3px solid #f7a928; outline-offset:3px; }
+    .wrap { max-width:1120px; padding:30px 18px 52px; margin:0 auto; }
+    header { padding:12px 0 20px; }
+    .eyebrow { display:inline-block; letter-spacing:.1em; font-size:.78rem; text-transform:uppercase; font-weight:800; color:#225e96; }
+    h1 { font-size:clamp(1.9rem,4.2vw,3.2rem); line-height:1.13; letter-spacing:-.035em; margin:8px 0 10px; }
+    header p { max-width:790px; color:var(--muted); font-size:1.05rem; margin:0; }
+    .workbench { display:grid; grid-template-columns:minmax(250px,330px) minmax(0,1fr); gap:18px; align-items:start; }
+    .panel { background:var(--paper); border:1px solid var(--line); border-radius:18px; box-shadow:0 5px 20px #2443670c; }
+    .controls { padding:24px; }
+    h2 { margin:0 0 12px; font-size:1.35rem; line-height:1.3; }
+    .step { color:#57718a; font-weight:700; text-transform:uppercase; letter-spacing:.075em; font-size:.75rem; margin-bottom:5px; }
+    .intro { margin:0 0 16px; color:var(--muted); font-size:.94rem; }
+    .field { margin-bottom:16px; }
+    label { font-weight:720; display:block; margin-bottom:6px; }
+    select { background:#fff; border:1.5px solid #9aafbf; border-radius:10px; padding:10px 12px; width:100%; min-height:46px; color:var(--ink); cursor:pointer; }
+    .hint { color:var(--muted); display:block; font-size:.79rem; margin-top:5px; }
+    .buttons { display:flex; flex-wrap:wrap; gap:9px; margin-top:18px; }
+    button { cursor:pointer; border-radius:10px; border:1px solid #b8c9d6; background:#fff; color:#16416a; padding:10px 14px; font-weight:720; transition:background .15s; }
+    button:hover { background:#eaf3fa; }
+    .primary { background:#1959a3; border-color:#1959a3; color:#fff; }
+    .primary:hover { background:#12477f; }
+    .output { padding:20px 24px 22px; }
+    .output-top { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; }
+    .chip { border-radius:99px; padding:7px 11px; font-weight:800; font-size:.85rem; background:#ecf4fc; color:#194c7e; }
+    .chip.on { background:#e2f5ed; color:#08583e; }
+    .chip.dim { background:#edf4fb; color:#15436c; }
+    .chip.off { background:#f0f2f5; color:#47586a; }
+    .chip.danger { background:#fff0d8; color:#86480e; }
+    .diagram { margin:15px 0; border:1px solid #e1eaf1; border-radius:14px; background:linear-gradient(155deg,#f7fbfd,#eef5fa); overflow:hidden; }
+    svg { display:block; width:100%; height:auto; }
+    .wire { stroke:#59778e; stroke-width:7; stroke-linecap:round; fill:none; }
+    .diagram-label { fill:#24435d; font:700 18px system-ui,sans-serif; }
+    .small-label { fill:#52697b; font:600 15px system-ui,sans-serif; }
+    .battery-mark { stroke:#233d52; stroke-width:7; stroke-linecap:round; }
+    #ledBulb { transition:fill .2s,filter .2s; }
+    #ledRays { transition:opacity .2s; }
+    #ledRays line { stroke:#e09d09; stroke-width:5; stroke-linecap:round; }
+    .diagram-note { margin:0 0 14px; font-size:.8rem; color:var(--muted); }
+    .result { border-left:5px solid #567c9e; padding:13px 16px; background:#f0f6fb; border-radius:0 9px 9px 0; }
+    .result.on { border-color:#16815b; background:#eaf7f1; }
+    .result.off, .result.dim { border-color:#627d99; background:#f0f6fb; }
+    .result.danger { border-color:#c57b21; background:#fff5e6; }
+    .result h3 { margin:0 0 5px; font-size:1.18rem; }
+    .result p { margin:0 0 8px; }
+    .result p:last-child { margin:0; }
+    .measurements { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:14px; }
+    .measurement { background:var(--soft); padding:12px 14px; border:1px solid var(--line); border-radius:10px; }
+    .measurement span { display:block; font-size:.77rem; font-weight:700; color:#587087; }
+    .measurement strong { font-size:1.28rem; font-variant-numeric:tabular-nums; }
+    .below { display:grid; grid-template-columns:1.05fr .95fr; gap:18px; margin-top:20px; }
+    .info { padding:22px 24px; }
+    .info p { margin:8px 0; }
+    .info ol { padding-left:24px; }
+    .missions { display:grid; gap:10px; }
+    .mission { text-align:left; width:100%; display:flex; gap:9px; align-items:flex-start; justify-content:space-between; }
+    .mission.active { border-color:#18599a; background:#eaf3fb; }
+    .mission small { color:#607489; display:block; font-weight:500; }
+    .success { margin:10px 0 0; padding:10px 12px; background:#e6f7ed; border-radius:8px; color:#10563b; font-weight:700; }
+    .muted { color:var(--muted); }
+    footer { padding-top:22px; margin-top:22px; border-top:1px solid #cddbe6; color:#53667a; font-size:.88rem; }
+    @media (max-width:780px) { .workbench,.below { grid-template-columns:1fr; } .wrap { padding:20px 12px 35px; } .controls,.output,.info { padding:18px; } }
+    @media (prefers-reduced-motion: reduce) { *,*::before,*::after { transition:none!important; animation:none!important; } }
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <span class="eyebrow">Interactive electronics lab</span>
+    <h1>Build an LED Circuit</h1>
+    <p>Can you make the light turn on <strong>safely</strong>? Change the battery, resistor, LED direction, and switch to discover how a simple electrical circuit works.</p>
+  </header>
+
+  <div class="workbench">
+    <section class="panel controls" aria-labelledby="controls-heading">
+      <p class="step">Step 1 · Make your choices</p>
+      <h2 id="controls-heading">Choose your components</h2>
+      <p class="intro">Try different combinations. The picture and explanation update every time you change a choice.</p>
+      <div class="field">
+        <label for="battery">Battery voltage</label>
+        <select id="battery">
+          <option value="1.5">1.5 volts</option><option value="3">3 volts</option><option value="5" selected>5 volts</option><option value="9">9 volts</option>
+        </select>
+        <span class="hint">The battery supplies electrical energy.</span>
+      </div>
+      <div class="field">
+        <label for="resistor">Series resistor</label>
+        <select id="resistor">
+          <option value="0">No resistor (unsafe experiment)</option>
+          <option value="100">100 Ω</option><option value="220">220 Ω</option><option value="330" selected>330 Ω</option><option value="1000">1,000 Ω (1 kΩ)</option>
+        </select>
+        <span class="hint">The resistor limits current through the LED.</span>
+      </div>
+      <div class="field">
+        <label for="polarity">LED direction</label>
+        <select id="polarity"><option value="forward">Correct: anode toward +</option><option value="reverse">Backward: cathode toward +</option></select>
+        <span class="hint">LEDs normally let current pass in only one direction.</span>
+      </div>
+      <div class="field">
+        <label for="switch">Switch position</label>
+        <select id="switch"><option value="closed">Closed (connected)</option><option value="open">Open (disconnected)</option></select>
+        <span class="hint">A closed loop is needed for current to flow.</span>
+      </div>
+      <div class="buttons"><button id="reset" type="button">↺ Reset circuit</button></div>
+    </section>
+
+    <section class="panel output" aria-labelledby="output-heading">
+      <div class="output-top">
+        <div><p class="step">Step 2 · See what happens</p><h2 id="output-heading">Your circuit</h2></div>
+        <span class="chip" id="statusChip">Checking circuit…</span>
+      </div>
+      <div class="diagram">
+        <svg viewBox="0 0 720 365" role="img" aria-labelledby="circuitTitle circuitDesc">
+          <title id="circuitTitle">Simple series circuit diagram</title>
+          <desc id="circuitDesc">Diagram with a battery on the left, a resistor at the top, a red LED on the right, and a switch at the bottom.</desc>
+          <defs>
+            <filter id="glow" x="-110%" y="-110%" width="320%" height="320%"><feGaussianBlur in="SourceGraphic" stdDeviation="11" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <path class="wire" d="M150 77 H275 M399 77 H560 V160 M560 227 V295 H406 M335 295 H150 V197 M150 158 V77" />
+          <line class="battery-mark" x1="117" y1="158" x2="183" y2="158" />
+          <line class="battery-mark" x1="135" y1="197" x2="165" y2="197" />
+          <text class="small-label" x="190" y="160">+</text><text class="small-label" x="183" y="203">−</text>
+          <text class="diagram-label" x="30" y="175">Battery</text><text class="small-label" x="44" y="201" id="vLabel">5 V</text>
+          <rect x="275" y="56" width="124" height="42" rx="9" fill="#d9e6f1" stroke="#48677f" stroke-width="3" />
+          <text class="diagram-label" x="337" y="83" text-anchor="middle" id="rLabel">330 Ω</text>
+          <text class="small-label" x="337" y="38" text-anchor="middle">Resistor</text>
+          <g id="ledRays" opacity="0"><line x1="525" y1="152" x2="510" y2="137"/><line x1="558" y1="142" x2="558" y2="120"/><line x1="592" y1="153" x2="607" y2="138"/><line x1="611" y1="190" x2="632" y2="190"/><line x1="593" y1="227" x2="611" y2="243"/></g>
+          <circle cx="560" cy="193" r="34" fill="#e9bbc2" stroke="#ab4055" stroke-width="4" id="ledBulb" />
+          <path d="M548 176 L548 211 M573 176 L573 211 M548 193 H573" stroke="#7f2437" stroke-width="4" stroke-linecap="round"/>
+          <text class="diagram-label" x="610" y="180">Red LED</text><text class="small-label" x="610" y="205" id="polarityLabel">+ at top</text>
+          <circle cx="335" cy="295" r="9" fill="#59778e"/><circle cx="406" cy="295" r="9" fill="#59778e"/>
+          <line id="switchArm" x1="335" y1="295" x2="406" y2="295" stroke="#24465e" stroke-width="7" stroke-linecap="round" />
+          <text class="small-label" x="371" y="340" text-anchor="middle" id="switchLabel">Switch: closed</text>
+          <text class="small-label" x="25" y="344">Simplified diagram · Not to scale</text>
+        </svg>
+      </div>
+      <p class="diagram-note">The illustration uses a simplified red LED model. It is for learning, not for wiring an unprotected physical LED.</p>
+      <div class="result" id="result" aria-live="polite" aria-atomic="true">
+        <h3 id="resultHeading">Calculating…</h3>
+        <p id="resultText">Your result will appear here.</p>
+        <p id="nextStep"></p>
+      </div>
+      <div class="measurements" aria-label="Calculated values">
+        <div class="measurement"><span>Estimated LED current</span><strong id="currentValue">—</strong></div>
+        <div class="measurement"><span>Estimated resistor drop</span><strong id="dropValue">—</strong></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="below">
+    <section class="panel info" aria-labelledby="challenges-heading">
+      <p class="step">Step 3 · Explore</p>
+      <h2 id="challenges-heading">Try three mini-challenges</h2>
+      <p class="muted">Select a challenge to load a circuit with a problem. Change one of the controls above until you fix it.</p>
+      <div class="missions">
+        <button class="mission" type="button" data-mission="1"><span><strong>Challenge 1: Fix the backward LED</strong><small>The LED is connected in reverse. Can you light it safely using 3 V?</small></span><span id="check1" aria-hidden="true">→</span></button>
+        <button class="mission" type="button" data-mission="2"><span><strong>Challenge 2: Too much current!</strong><small>This 9 V circuit could damage the LED. Make it safe.</small></span><span id="check2" aria-hidden="true">→</span></button>
+        <button class="mission" type="button" data-mission="3"><span><strong>Challenge 3: Complete the path</strong><small>The LED has enough voltage, but it won't light. Find the problem.</small></span><span id="check3" aria-hidden="true">→</span></button>
+      </div>
+      <p id="missionFeedback" class="muted" role="status" aria-live="polite">You can also explore without using a challenge.</p>
+    </section>
+    <section class="panel info" aria-labelledby="learn-heading">
+      <p class="step">What the activity teaches</p>
+      <h2 id="learn-heading">Why do the choices matter?</h2>
+      <ol>
+        <li><strong>Voltage:</strong> A typical red LED needs about 2 V in this simplified model. At 1.5 V, it won't light normally.</li>
+        <li><strong>Resistance:</strong> A resistor reduces the current to help protect the LED. Too little resistance can allow damaging current.</li>
+        <li><strong>Polarity:</strong> An LED must face the correct way to conduct normally.</li>
+        <li><strong>Closed circuit:</strong> An open switch interrupts the path, so current stops.</li>
+      </ol>
+      <p><strong>Our simple equation:</strong> current ≈ (battery voltage − 2.0 V) ÷ resistance. When used, this estimates current in amps; the display converts it to milliamps (mA).</p>
+      <p class="muted"><small>Educational model: ideal battery, fixed 2.0 V red LED forward drop, typical 20 mA design ceiling. Actual LEDs vary, and the appropriate resistor must be chosen from the specific LED datasheet. Overcurrent and reverse-voltage choices are deliberately marked as unsafe.</small></p>
+    </section>
+  </div>
+
+  <footer>
+    <p><strong>Learn more:</strong> <a href="https://learn.sparkfun.com/tutorials/what-is-a-circuit/overview" target="_blank" rel="noopener noreferrer">What Is a Circuit? (SparkFun)</a> and <a href="https://learn.sparkfun.com/tutorials/light-emitting-diodes-leds/all" target="_blank" rel="noopener noreferrer">Light-Emitting Diodes (SparkFun)</a>.</p>
+    <p>Diagram and interface are original to this activity; produced with assistance from ChatGPT. No external images, music, or video are used.</p>
+  </footer>
+</main>
+<script>
+(function () {
+  'use strict';
+  const find = id => document.getElementById(id);
+  const battery = find('battery');
+  const resistor = find('resistor');
+  const polarity = find('polarity');
+  const circuitSwitch = find('switch');
+  const choices = [battery,resistor,polarity,circuitSwitch];
+  let activeMission = null;
+  const completed = new Set();
+  const fmt = n => Number.isFinite(n) ? n.toFixed(1) : '—';
+
+  function evaluate() {
+    const volts = Number(battery.value);
+    const ohms = Number(resistor.value);
+    const reversed = polarity.value === 'reverse';
+    const open = circuitSwitch.value === 'open';
+    const vDrop = 2.0;
+    let mode, heading, info, advice, current = null, drop = null;
+
+    if (open) {
+      mode='off'; heading='The LED is off: the circuit is open.';
+      info='The switch breaks the loop, so current cannot flow through the LED.';
+      advice='Close the switch to complete the path.'; current=0; drop=0;
+    } else if (reversed && volts >= 5) {
+      mode='danger'; heading='Caution: the LED is backward.';
+      info='The LED blocks normal forward current. This battery may apply enough reverse voltage to damage some LEDs.';
+      advice='Turn the LED around before using a real circuit. LED reverse-voltage limits vary.'; current=0; drop=0;
+    } else if (reversed) {
+      mode='off'; heading='The LED is off: it is backward.';
+      info='The cathode faces the positive side of the battery. An LED does not normally conduct in this direction.';
+      advice='Reverse the LED direction to make its anode face the positive supply.'; current=0; drop=0;
+    } else if (ohms === 0 && volts > vDrop) {
+      mode='danger'; heading='Unsafe: there is no current-limiting resistor.';
+      info='The LED might light briefly, but its current is not safely controlled and it could be damaged.';
+      advice='Choose a resistor before building a real LED circuit. This simplified model cannot calculate current without one.';
+    } else if (volts <= vDrop) {
+      mode='off'; heading='The LED is off: not enough voltage.';
+      info='This model assumes a red LED needs approximately 2.0 V to conduct and glow. Your battery provides less than that.';
+      advice='Try a 3 V or 5 V battery with a suitable resistor.'; current=0; drop=0;
+    } else {
+      current = 1000 * (volts - vDrop) / ohms;
+      drop = volts - vDrop;
+      if (current > 20) {
+        mode='danger'; heading='Warning: the current is too high.';
+        info='The LED may shine, but about '+fmt(current)+' mA exceeds the 20 mA design ceiling used for this example. It could overheat or fail.';
+        advice='Choose a larger resistor to lower the current.';
+      } else if (current < 2) {
+        mode='dim'; heading='The LED is barely glowing.';
+        info='Only about '+fmt(current)+' mA flows. Depending on the LED and surroundings, this may look very dim.';
+        advice='Try a smaller resistor, but keep the predicted current at or below 20 mA.';
+      } else {
+        mode='on'; heading='Success! Your LED lights safely.';
+        info='The closed loop, forward-facing LED, and resistor allow approximately '+fmt(current)+' mA of current.';
+        advice='Good job! Change the resistor or battery and see what happens.';
+      }
+    }
+
+    const chip = find('statusChip');
+    chip.className='chip '+mode;
+    chip.textContent=({on:'LED ON · safe',dim:'LED DIM',off:'LED OFF',danger:'CHECK SAFETY'})[mode];
+    const result = find('result'); result.className='result '+mode;
+    find('resultHeading').textContent=heading;
+    find('resultText').textContent=info;
+    find('nextStep').textContent=advice;
+    find('currentValue').textContent=current === null?'Not estimated':fmt(current)+' mA';
+    find('dropValue').textContent=drop === null?'Not estimated':fmt(drop)+' V';
+    find('vLabel').textContent=volts+' V';
+    find('rLabel').textContent=ohms===0?'None':(ohms===1000?'1 kΩ':ohms+' Ω');
+    find('polarityLabel').textContent=reversed?'− at top':' + at top';
+    find('switchLabel').textContent='Switch: '+(open?'open':'closed');
+    find('switchArm').setAttribute('x2',open?'394':'406');
+    find('switchArm').setAttribute('y2',open?'258':'295');
+    const bulb = find('ledBulb'), rays=find('ledRays');
+    bulb.style.fill=mode==='on'?'#ef5364':mode==='dim'?'#e78a96':mode==='danger'?'#efb25d':'#e4bac2';
+    bulb.style.filter=mode==='on'?'url(#glow)':'none';
+    rays.style.opacity=mode==='on'?'1':mode==='dim'?'0.45':'0';
+    find('circuitDesc').textContent='Battery '+volts+' volts; '+(ohms===0?'no resistor':ohms+' ohm resistor')+'; LED '+(reversed?'reversed':'forward')+'; switch '+(open?'open':'closed')+'. Result: '+heading;
+
+    if (activeMission !== null) {
+      const win = mode === 'on' && ((activeMission===1 && volts===3) || (activeMission===2 && volts===9) || (activeMission===3 && volts===5));
+      const msg = find('missionFeedback');
+      if (win) {
+        completed.add(activeMission);
+        msg.className='success';
+        msg.textContent='✓ Challenge '+activeMission+' completed! '+(activeMission===1?'The LED is facing the correct way.':activeMission===2?'The resistor keeps current within the example safe range.':'Closing the switch completes the loop.');
+      } else {
+        msg.className='muted';
+        msg.textContent='Challenge '+activeMission+': make the LED glow safely. Check the explanation above for clues.';
+      }
+      for (let i=1;i<=3;i++) find('check'+i).textContent=completed.has(i)?'✓':'→';
+    }
+  }
+
+  choices.forEach(c=>c.addEventListener('change',evaluate));
+  find('reset').addEventListener('click',()=>{
+    battery.value='5'; resistor.value='330'; polarity.value='forward'; circuitSwitch.value='closed';
+    activeMission=null; completed.clear();
+    document.querySelectorAll('.mission').forEach(btn=>btn.classList.remove('active'));
+    for(let i=1;i<=3;i++) find('check'+i).textContent='→';
+    const msg=find('missionFeedback'); msg.className='muted'; msg.textContent='You can also explore without using a challenge.';
+    evaluate();
+  });
+  const presets={1:['3','330','reverse','closed'],2:['9','100','forward','closed'],3:['5','220','forward','open']};
+  document.querySelectorAll('[data-mission]').forEach(btn=>btn.addEventListener('click',()=>{
+    activeMission=Number(btn.dataset.mission);
+    [battery.value,resistor.value,polarity.value,circuitSwitch.value]=presets[activeMission];
+    document.querySelectorAll('.mission').forEach(b=>b.classList.toggle('active',b===btn));
+    evaluate();
+    find('controls-heading').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+  }));
+  evaluate();
+})();
+</script>
+</body>
+</html>
